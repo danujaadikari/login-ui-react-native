@@ -2,7 +2,13 @@
 
 A clean and modern Login and Sign Up UI built with React Native and Expo, following Human-Computer Interaction (HCI) principles. This is a UI-only project designed as a portfolio piece.
 
-## 🎨 Features
+## � Live Demo
+
+**[View Live Demo →](https://danujalogin-ui.netlify.app/)**
+
+Experience the premium UI/UX with modern design, smooth animations, and real-time validation.
+
+## �🎨 Features
 
 - **Login Screen** - Email and password authentication UI
 - **Sign Up Screen** - Full registration form with validation
