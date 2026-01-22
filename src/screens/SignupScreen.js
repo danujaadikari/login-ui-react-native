@@ -11,39 +11,76 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import InputField from '../components/InputField';
 import PrimaryButton from '../components/PrimaryButton';
+import SocialButton from '../components/SocialButton';
+import Checkbox from '../components/Checkbox';
+import PasswordStrength from '../components/PasswordStrength';
 import colors from '../theme/colors';
+import typography from '../theme/typography';
 
 /**
- * Sign Up Screen Component
- * HCI Principles Applied:
- * - Progressive disclosure (fields in logical order)
- * - Clear visual hierarchy (Create Account → Inputs → Button → Link)
- * - Consistent layout with Login screen (familiarity)
- * - Immediate validation feedback
- * - Password confirmation prevents user errors
+ * PREMIUM SIGNUP SCREEN - 2025 Design
+ * 
+ * Features:
+ * ✓ Password strength indicator (real-time)
+ * ✓ Social signup options
+ * ✓ Terms & Privacy checkbox
+ * ✓ Progressive validation
+ * ✓ Error prevention (confirm password)
+ * ✓ Modern card layout
+ * ✓ Accessible and mobile-first
  */
 const SignupScreen = ({ onNavigateToLogin }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   
   const [fullNameError, setFullNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [termsError, setTermsError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Comprehensive validation for better UX (HCI: Error Prevention)
-  const handleSignup = () => {
-    // Clear all previous errors
+  // Email validation with regex
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Real-time email validation
+  const handleEmailChange = (text) => {
+    setEmail(text);
+    if (text && !validateEmail(text)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  // Real-time password confirmation check
+  const handleConfirmPasswordChange = (text) => {
+    setConfirmPassword(text);
+    if (text && password && text !== password) {
+      setConfirmPasswordError('Passwords do not match');
+    } else {
+      setConfirmPasswordError('');
+    }
+  };
+
+  // Comprehensive form validation
+  const handleSignup = async () => {
+    // Clear all errors
     setFullNameError('');
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
+    setTermsError('');
 
     let isValid = true;
 
-    // Validate full name
+    // Full name validation
     if (!fullName.trim()) {
       setFullNameError('Full name is required');
       isValid = false;
@@ -52,16 +89,16 @@ const SignupScreen = ({ onNavigateToLogin }) => {
       isValid = false;
     }
 
-    // Validate email
+    // Email validation
     if (!email) {
       setEmailError('Email is required');
       isValid = false;
-    } else if (!email.includes('@') || !email.includes('.')) {
+    } else if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address');
       isValid = false;
     }
 
-    // Validate password
+    // Password validation
     if (!password) {
       setPasswordError('Password is required');
       isValid = false;
@@ -70,7 +107,7 @@ const SignupScreen = ({ onNavigateToLogin }) => {
       isValid = false;
     }
 
-    // Validate password confirmation
+    // Confirm password validation
     if (!confirmPassword) {
       setConfirmPasswordError('Please confirm your password');
       isValid = false;
@@ -79,11 +116,29 @@ const SignupScreen = ({ onNavigateToLogin }) => {
       isValid = false;
     }
 
-    if (isValid) {
-      // HCI: Provide feedback on successful action
-      console.log('Account created successfully (UI only)');
-      // In a real app, this would call an API
+    // Terms agreement validation
+    if (!agreedToTerms) {
+      setTermsError('Please agree to the Terms and Privacy Policy');
+      isValid = false;
     }
+
+    if (isValid) {
+      setLoading(true);
+      // Simulate API call (UI only)
+      setTimeout(() => {
+        setLoading(false);
+        console.log('✅ Account created successfully (UI only)');
+      }, 1500);
+    }
+  };
+
+  // Social signup handlers (UI only)
+  const handleGoogleSignup = () => {
+    console.log('🔵 Google OAuth Signup (UI only)');
+  };
+
+  const handleGitHubSignup = () => {
+    console.log('⚫ GitHub OAuth Signup (UI only)');
   };
 
   return (
@@ -97,66 +152,108 @@ const SignupScreen = ({ onNavigateToLogin }) => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* HCI: Visual Hierarchy - Header establishes context */}
+        {/* Premium Header */}
         <View style={styles.header}>
+          <Text style={styles.greeting}>✨</Text>
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>
-            Sign up to get started
+            Join us and start your journey today
           </Text>
         </View>
 
-        {/* HCI: Logical field order (name → email → password) */}
-        <View style={styles.form}>
-          <InputField
-            label="Full Name"
-            placeholder="Enter your full name"
-            value={fullName}
-            onChangeText={setFullName}
-            autoCapitalize="words"
-            error={fullNameError}
-          />
+        {/* Premium Card Container */}
+        <View style={styles.card}>
+          {/* Social Signup */}
+          <View style={styles.socialSection}>
+            <SocialButton provider="google" onPress={handleGoogleSignup} />
+            <SocialButton provider="github" onPress={handleGitHubSignup} />
+          </View>
 
-          <InputField
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            error={emailError}
-          />
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>Or sign up with email</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
-          <InputField
-            label="Password"
-            placeholder="Create a password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            error={passwordError}
-          />
+          {/* Signup Form */}
+          <View style={styles.form}>
+            <InputField
+              label="Full Name"
+              placeholder="John Doe"
+              value={fullName}
+              onChangeText={setFullName}
+              autoCapitalize="words"
+              error={fullNameError}
+            />
 
-          <InputField
-            label="Confirm Password"
-            placeholder="Re-enter your password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            error={confirmPasswordError}
-          />
+            <InputField
+              label="Email Address"
+              placeholder="you@example.com"
+              value={email}
+              onChangeText={handleEmailChange}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              error={emailError}
+            />
 
-          {/* HCI: Clear primary action */}
-          <PrimaryButton
-            title="Create Account"
-            onPress={handleSignup}
-            style={styles.signupButton}
-          />
+            <InputField
+              label="Password"
+              placeholder="Create a strong password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              error={passwordError}
+            />
 
-          {/* HCI: Easy navigation to alternative action */}
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>Already have an account? </Text>
-            <TouchableOpacity onPress={onNavigateToLogin}>
-              <Text style={styles.loginLink}>Login</Text>
-            </TouchableOpacity>
+            {/* Password Strength Indicator - HCI: Real-time Feedback */}
+            <PasswordStrength password={password} />
+
+            <InputField
+              label="Confirm Password"
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChangeText={handleConfirmPasswordChange}
+              secureTextEntry
+              error={confirmPasswordError}
+            />
+
+            {/* Terms & Privacy - HCI: Legal Compliance */}
+            <View style={styles.termsSection}>
+              <Checkbox
+                checked={agreedToTerms}
+                onPress={() => {
+                  setAgreedToTerms(!agreedToTerms);
+                  setTermsError('');
+                }}
+                label=""
+              />
+              <View style={styles.termsTextContainer}>
+                <Text style={styles.termsText}>
+                  I agree to the{' '}
+                  <Text style={styles.termsLink}>Terms of Service</Text>
+                  {' '}and{' '}
+                  <Text style={styles.termsLink}>Privacy Policy</Text>
+                </Text>
+              </View>
+            </View>
+            {termsError ? <Text style={styles.termsError}>{termsError}</Text> : null}
+
+            {/* Create Account Button */}
+            <PrimaryButton
+              title="Create Account"
+              onPress={handleSignup}
+              loading={loading}
+              style={styles.signupButton}
+            />
+
+            {/* Login Link */}
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Already have an account? </Text>
+              <TouchableOpacity onPress={onNavigateToLogin}>
+                <Text style={styles.loginLink}>Sign In</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -171,43 +268,104 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24, // HCI: Consistent with Login screen
+    paddingHorizontal: 24,
     paddingVertical: 40,
   },
   header: {
-    marginBottom: 40, // HCI: Consistent spacing
+    marginBottom: 32,
+    alignItems: 'center',
+  },
+  greeting: {
+    fontSize: 48,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 32, // HCI: Consistent typography
-    fontWeight: 'bold',
+    fontSize: typography.fontSize['3xl'],
+    fontWeight: typography.fontWeight.bold,
     color: colors.textPrimary,
     marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: colors.textSecondary, // HCI: Visual hierarchy
+    fontSize: typography.fontSize.base,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: typography.lineHeight.relaxed * typography.fontSize.base,
+  },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: colors.shadowColor,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  socialSection: {
+    gap: 10,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: typography.fontSize.sm,
+    color: colors.textTertiary,
+    fontWeight: typography.fontWeight.medium,
   },
   form: {
     width: '100%',
   },
+  termsSection: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  termsTextContainer: {
+    flex: 1,
+    marginLeft: -12,
+  },
+  termsText: {
+    fontSize: typography.fontSize.xs,
+    color: colors.textSecondary,
+    lineHeight: typography.lineHeight.relaxed * typography.fontSize.xs,
+  },
+  termsLink: {
+    color: colors.primary,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  termsError: {
+    fontSize: typography.fontSize.xs,
+    color: colors.error,
+    marginBottom: 12,
+    marginLeft: 24,
+  },
   signupButton: {
-    marginTop: 8, // HCI: Consistent spacing
+    marginTop: 16,
+    marginBottom: 20,
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 24, // HCI: Separated from primary action
+    marginTop: 8,
   },
   loginText: {
-    fontSize: 14,
+    fontSize: typography.fontSize.sm,
     color: colors.textSecondary,
   },
   loginLink: {
-    fontSize: 14,
-    color: colors.primary, // HCI: Consistent link styling
-    fontWeight: '600',
+    fontSize: typography.fontSize.sm,
+    color: colors.primary,
+    fontWeight: typography.fontWeight.semibold,
   },
 });
 
