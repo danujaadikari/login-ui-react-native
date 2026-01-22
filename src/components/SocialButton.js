@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import colors from '../theme/colors';
 import typography from '../theme/typography';
 
@@ -7,7 +8,7 @@ import typography from '../theme/typography';
  * SOCIAL AUTH BUTTON - OAuth Integration Ready
  * 
  * HCI Principles:
- * ✓ Recognizable brand colors
+ * ✓ Recognizable brand icons
  * ✓ Icon + Text for clarity
  * ✓ Large touch target (50px)
  * ✓ Visual feedback on press
@@ -16,17 +17,42 @@ const SocialButton = ({ provider, onPress, style = {} }) => {
   const getProviderConfig = () => {
     switch (provider) {
       case 'google':
-        return { icon: '🔵', text: 'Continue with Google', color: colors.google };
+        return { 
+          IconComponent: AntDesign,
+          iconName: 'google',
+          text: 'Continue with Google', 
+          color: colors.google,
+          iconColor: '#4285F4'
+        };
       case 'github':
-        return { icon: '⚫', text: 'Continue with GitHub', color: colors.github };
+        return { 
+          IconComponent: AntDesign,
+          iconName: 'github',
+          text: 'Continue with GitHub', 
+          color: colors.github,
+          iconColor: '#24292E'
+        };
       case 'apple':
-        return { icon: '⚫', text: 'Continue with Apple', color: colors.apple };
+        return { 
+          IconComponent: AntDesign,
+          iconName: 'apple1',
+          text: 'Continue with Apple', 
+          color: colors.apple,
+          iconColor: '#000000'
+        };
       default:
-        return { icon: '🔘', text: 'Continue', color: colors.textSecondary };
+        return { 
+          IconComponent: FontAwesome,
+          iconName: 'circle-o',
+          text: 'Continue', 
+          color: colors.textSecondary,
+          iconColor: colors.textSecondary
+        };
     }
   };
 
   const config = getProviderConfig();
+  const { IconComponent, iconName, iconColor } = config;
 
   return (
     <TouchableOpacity
@@ -34,7 +60,7 @@ const SocialButton = ({ provider, onPress, style = {} }) => {
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <Text style={styles.icon}>{config.icon}</Text>
+      <IconComponent name={iconName} size={20} color={iconColor} style={styles.icon} />
       <Text style={styles.text}>{config.text}</Text>
     </TouchableOpacity>
   );
@@ -59,7 +85,6 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   icon: {
-    fontSize: 20,
     marginRight: 12,
   },
   text: {
